@@ -7,11 +7,14 @@
   // Two cores keeps this inside the free 120 core-hours (60 hours) a month.
   "hostRequirements": { "cpus": 2 },
 
-  "postCreateCommand": "bun install --frozen-lockfile",
+  // --trust matters: the CLI's postinstall fetches the platform binary, and
+  // Bun blocks postinstalls by default. Without it every command fails with
+  // "@opencode/cli's postinstall script was not run".
+  "postCreateCommand": "bun install --frozen-lockfile && bun add -g --trust @opencode/cli@2.4.1",
 
-  // The published CLI serves both the v2 API and the web UI on one origin.
-  // Restarting the codespace re-runs this, so guard against a second copy.
-  "postStartCommand": "bash -lc 'pgrep -f \"opencode serve\" >/dev/null || (nohup bunx @opencode/cli@2.4.1 serve --hostname 0.0.0.0 --port 4096 > /tmp/opencode.log 2>&1 &)'",
+  // Password lives in $HOME, never in the repo. Stable across restarts; the
+  // log prints it too if the file is lost.
+  "postStartCommand": "bash -lc 'cd /workspaces/opencodeweb && (pgrep -f \"opencode serve\" >/dev/null || (OPENCODE_PASSWORD=$(cat $HOME/.opencode-password 2>/dev/null || (openssl rand -hex 16 | tee $HOME/.opencode-password)) nohup opencode serve --hostname 0.0.0.0 --port 4096 > /tmp/opencode.log 2>&1 &))'",
 
   "forwardPorts": [4096],
   "portsAttributes": {

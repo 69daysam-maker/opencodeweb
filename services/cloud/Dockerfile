@@ -22,9 +22,9 @@ ENV CHROME_PATH=/usr/bin/chromium
 ENV CHROMIUM_PATH=/usr/bin/chromium
 ENV OPENCODE_SERVER_PORT=4096
 
-# The same release this fork tracks. Swap this for a `COPY` + `bun install`
-# build if you need the container to run fork-specific server code.
-RUN bun add -g @opencode/cli@2.4.1
+# The same release this fork tracks. --trust is required: the CLI's postinstall
+# fetches its platform binary, and Bun blocks postinstalls by default.
+RUN bun add -g --trust @opencode/cli@2.4.1
 
 WORKDIR /workspace
 EXPOSE 4096
