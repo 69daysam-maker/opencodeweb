@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "opencodeweb",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-26",
+
+  // The UI is the real packages/app build, served by this Worker.
+  "assets": {
+    "directory": "../../packages/app/dist",
+    "binding": "ASSETS"
+  },
+
+  "containers": [
+    {
+      "class_name": "AgentContainer",
+      "image": "./Dockerfile",
+      // 1 vCPU / 6 GiB: enough for opencode plus a Chromium process.
+      "instance_type": "standard-2",
+      "max_instances": 1
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [{ "name": "AGENT", "class_name": "AgentContainer" }]
+  },
+
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AgentContainer"] }],
+
+  "observability": { "enabled": true }
+}
