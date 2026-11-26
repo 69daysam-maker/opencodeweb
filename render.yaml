@@ -1,0 +1,25 @@
+# Render Blueprint — the free, no-card host that actually runs the agent.
+#
+# Deploy: https://render.com/deploy?repo=https://github.com/69daysam-maker/opencodeweb
+#
+# Free tier reality: 512 MB RAM, sleeps after 15 min without traffic, wakes in
+# about a minute on the next browser visit, ephemeral disk (workspace resets).
+services:
+  - type: web
+    name: opencodeweb
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./services/cloud/Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+      # Render generates this. Read it in Dashboard -> opencodeweb -> Environment
+      # and use it as the login password; it is never in the repo.
+      - key: OPENCODE_PASSWORD
+        generateValue: true
+      # Your own OpenRouter key, entered in the dashboard (sync: false), never here.
+      - key: OPENROUTER_API_KEY
+        sync: false
